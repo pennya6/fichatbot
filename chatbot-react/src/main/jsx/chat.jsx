@@ -40,7 +40,7 @@ const Messenger = () =>{
         setMessages([...messages,message]);
         
         //ajax 짜기
-        const url=`http://localhost:8080/Chatbot/chat`;
+        const url=`http://localhost:8089/chatbot/chat`;
 
         //Access-Control-Allow-Origin response 헤더를 추가
         
@@ -54,14 +54,14 @@ const Messenger = () =>{
             body:JSON.stringify({ //json형태를 string화 하기 위해서
                 data:messages
                 //headers부분에 CORS문제 해결
-            }), headers:{'Content-Type':'application/json'}})
+            }), headers:{'Access-Control-Allow-Origin':"*","Content-Type":"application/json"}})
             //보내고 나서 처리를 어떻게 할 것 인가?
             //송신후에 받아와서 json형태로 만든다
             .then((res) => res.json())
             //다시 데이터로 받아서 
             .then((data) => {
                 //메세지안에 저장하겠다
-                setMessages([...messages,data]);
+                setMessages(messages=>[...messages,data]);
             }).catch(()=>{ //오류 잡기
                 console.log("에러발생");
             });
