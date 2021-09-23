@@ -2,6 +2,16 @@ import { useState } from "react";
 import Chat from "react-simple-chat";
 import 'react-simple-chat/src/components/index.css';
 
+//react에서 api를 사용하는 방법으로 크게 Axios, Fetch api가 있다
+
+//fetch() 함수 기본 틀
+//fetch()
+//.then(res=>res.json())
+//.then(res=>{
+//   data를 응답 받은 후의 로직 
+//});
+//
+
 const Messenger = () =>{
 
     //state란 -> 컴포넌트 내부에서 변경될 수 있는 값 
@@ -12,34 +22,44 @@ const Messenger = () =>{
     const [messages,setMessages] = useState([
         {
             id : 'chatbot',
-            text: '안녕하세요 궁금한 것을 물어보세요.',
+            text: '안녕하세요 chatbot입니다.',
             createdAt : new Date(),
             user : {id:'user'}
         }
     ]);
 
-   /*  //CORS : 도메인 또는 포트가 다른 서버의 자원을 요청하는 메커니즘
+    //CORS : 도메인 또는 포트가 다른 서버의 자원을 요청하는 메커니즘
     const getAnswer=(message) =>{
         setMessages([...messages,messages]);
+        
+        //api주소
         const url='http://localhost:8080/main/chat';
 
         //Access-Control-Allow-Origin response 헤더를 추가
         
-        fetch(url,{method:"POST",body:JSON.stringify({data:messages}), headers:{'Content-Type':'application/json'})
-        .then((res) => res.json())
-        .then((data) => {
-            setMessages("성공");
-        }).catch(()=>{
-            console.log("에러발생");
-        });
-    }; */
+        //fetch함수 기본 틀
+        //method가 post인 경우
+        //fetch()기본은 get이기 때문에 post인 경우에는 method정보를 인자로 넘겨주어야한다
+        fetch(url,{
+            method:"POST",
+            body:JSON.stringify({
+                data:messages
+                //headers부분에 CORS문제 해결
+            }), headers:{'Content-Type':'application/json'}})
+            .then((res) => res.json())
+            .then((data) => {
+                setMessages("성공");
+            }).catch(()=>{
+                console.log("에러발생");
+            });
+    }; 
 
     return(
         <Chat
-            title="챗봇 샘플"
+            title="pennya6 Chatbot"
             user={{id : 'chatbot'}}
             messages={messages}
-            onSend={messages=>setMessages([...messages,messages])}
+            onSend={messages=>setMessages([messages])}
         />
     );
 };
