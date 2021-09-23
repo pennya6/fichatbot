@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Chat from "react-simple-chat";
+import Chat,{message} from "react-simple-chat";
 import 'react-simple-chat/src/components/index.css';
 
 //react에서 api를 사용하는 방법으로 크게 Axios, Fetch api가 있다
@@ -19,6 +19,9 @@ const Messenger = () =>{
 
     //첫번째 파라미터는 '현재상태', 두번째는 '현재 상태를 바꿔주는 함수'
     //setMessages는 message(현재상태)를 바꿔줄 함수
+
+    //처음 message 상태
+    //id값을 통해서 송신자, 수신자 판별
     const [messages,setMessages] = useState([
         {
             id : 'chatbot',
@@ -28,28 +31,38 @@ const Messenger = () =>{
         }
     ]);
 
+    //응답 만들기
     //CORS : 도메인 또는 포트가 다른 서버의 자원을 요청하는 메커니즘
     const getAnswer=(message) =>{
-        setMessages([...messages,messages]);
+        console.log("HI");
+
+        //처음 질문도 저장하기 위해서
+        setMessages([...messages,message]);
         
-        //api주소
-        const url='http://localhost:8080/main/chat';
+        //ajax 짜기
+        const url=`http://localhost:8080/Chatbot/chat`;
 
         //Access-Control-Allow-Origin response 헤더를 추가
         
+        //자바스크립트를 사용하기 위해서 fetch사용
         //fetch함수 기본 틀
         //method가 post인 경우
         //fetch()기본은 get이기 때문에 post인 경우에는 method정보를 인자로 넘겨주어야한다
         fetch(url,{
+            //post,get,delete 등 4가지 메소드
             method:"POST",
-            body:JSON.stringify({
+            body:JSON.stringify({ //json형태를 string화 하기 위해서
                 data:messages
                 //headers부분에 CORS문제 해결
             }), headers:{'Content-Type':'application/json'}})
+            //보내고 나서 처리를 어떻게 할 것 인가?
+            //송신후에 받아와서 json형태로 만든다
             .then((res) => res.json())
+            //다시 데이터로 받아서 
             .then((data) => {
-                setMessages("성공");
-            }).catch(()=>{
+                //메세지안에 저장하겠다
+                setMessages([...messages,data]);
+            }).catch(()=>{ //오류 잡기
                 console.log("에러발생");
             });
     }; 
@@ -59,7 +72,9 @@ const Messenger = () =>{
             title="pennya6 Chatbot"
             user={{id : 'chatbot'}}
             messages={messages}
-            onSend={messages=>setMessages([messages])}
+            //()=> 함수 표시 필수
+            
+            onSend={(message)=>getAnswer(message)}
         />
     );
 };
