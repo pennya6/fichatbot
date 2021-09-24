@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Chat,{message} from "react-simple-chat";
 import 'react-simple-chat/src/components/index.css';
 
@@ -22,25 +22,25 @@ const Messenger = () =>{
 
     //처음 message 상태
     //id값을 통해서 송신자, 수신자 판별
-    const [messages,setMessages] = useState([
-        {
-            id : 'chatbot',
-            text: '안녕하세요 chatbot입니다.',
-            createdAt : new Date(),
-            user : {id:'user'}
-        }
-    ]);
+     const [messages,setMessages] = useState([
+        //{
+            // id : 'chatbot',
+    //         //text: '안녕하세요 chatbot입니다.',
+            // createdAt : new Date(),
+            // user : {id:'user'}
+         //}
+     ]);
 
     //응답 만들기
     //CORS : 도메인 또는 포트가 다른 서버의 자원을 요청하는 메커니즘
     const getAnswer=(message) =>{
-        console.log("HI");
+        //console.log("HI");
 
         //처음 질문도 저장하기 위해서
         setMessages([...messages,message]);
         
         //ajax 짜기
-        const url=`http://localhost:8089/chatbot/chat`;
+        const url=`http://localhost:8089/chatbot/chat/message`;
 
         //Access-Control-Allow-Origin response 헤더를 추가
         
@@ -66,6 +66,34 @@ const Messenger = () =>{
                 console.log("에러발생");
             });
     }; 
+
+    const openChat =(message) =>{
+        //fetch 메소드 구현하기
+        console.log("openChat");
+
+        //setMessages([...messages,message]);
+        const url=`http://localhost:8089/chatbot/chat/open`;
+
+        fetch(url,{
+            method:"POST",body:JSON.stringify({ //json형태를 string화 하기 위해서
+                data:messages
+                //headers부분에 CORS문제 해결
+            }),
+            headers:{'Access-Control-Allow-Origin':"*","Content-Type":"application/json"}})
+            .then((res) =>res.json())
+            .then((data)=>{
+                setMessages(messages=>[...messages,data]);
+            })
+            .catch(()=>{
+                console.log("error");
+            });
+
+        };
+    
+
+    //상태값을 바뀌면 호출
+    //처음들어오면 오픈챗 메소드를 탐
+    useEffect(openChat,[]);
 
     return(
         <Chat
