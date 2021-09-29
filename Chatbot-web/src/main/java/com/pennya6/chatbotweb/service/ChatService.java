@@ -16,16 +16,17 @@ import com.pennya6.chatbotweb.util.CacheUtils;
 public class ChatService {
 	
 	@Autowired CacheUtils cache;
+	ChatDao chatDao=new ChatDao();
 	
 	public Map open() {
 		
-		ChatDao chatDao=new ChatDao();
 		Map resp=chatDao.open();
 		
 		System.out.println(resp);
 		
 		Map return_object=MapUtils.getMap(resp, "return_object");
 		String uuid=MapUtils.getString(return_object, "uuid");
+		
 		//System.out.println(uuid);
 		cache.put("uuid",uuid);
 		return makeTemplate(resp);
@@ -42,8 +43,10 @@ public class ChatService {
 		chatbotInfo.put("id","user");
 		
 		map.put("id", "chatbot");
+		
 		System.out.println(return_object);
 		System.out.println(result);
+		
 		map.put("text", MapUtils.getString(result, "system_text"));
 		map.put("createdAt", new Date());
 		map.put("user",chatbotInfo);
@@ -55,13 +58,15 @@ public class ChatService {
 	}
 
 	public Map message(Map<String, Object> data) {
-		ChatDao chatDao=new ChatDao();
 		
 		String uuid=(String)cache.get("uuid");
-		data.put("uuid", uuid);
+		Map req=new HashMap();
+		req.put("uuid", uuid);
 		
-		//Map resp=chatDao.message();
-		return chatDao.message(data);
+		Map map=MapUtils.getMap(data, "data");
+		req.put("text", MapUtils.getString(map, "text"));
+		
+		return makeTemplate(chatDao.message(req));
 	}
 
 }

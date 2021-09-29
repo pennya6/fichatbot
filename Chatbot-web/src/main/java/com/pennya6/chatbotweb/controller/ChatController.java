@@ -45,15 +45,15 @@ public class ChatController {
 	//요청이 들어오면 받아라
 	@CrossOrigin("*")
 	//method가 post이기 때문에 postmapping
-	@PostMapping(value="/chat") 
+	@PostMapping(value="/chat/message") 
 	//requestmapping도 사용하기는 함
 	//단 getmapping하면 더 길이가 줌
 	public Map message(@RequestBody Map<String,Object>data){//Locale locale,Model model) {
-		logger.info("메세지 불러오기");
+		//logger.info("메세지 불러오기");
 	
-		System.out.println(data);
+		//System.out.println(data);
 		//자료구조 map
-		Map map=new HashMap();
+		//Map map=new HashMap();
 		
 		return chatService.message(data);
 		

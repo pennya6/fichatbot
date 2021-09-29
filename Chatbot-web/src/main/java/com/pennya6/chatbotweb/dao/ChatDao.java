@@ -43,17 +43,15 @@ public class ChatDao {
 		return resp;
 	}
 
-	public Map message() {
+	public Map message(Map map) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		Map<String, String> argument = new HashMap<String, String>();
 		
-		argument.put("name", "Genie_Pizza");
-		argument.put("access_method", "internal_data");
-		argument.put("method", "open_dialog");
-		argument.put("text", (String)map.get(text));
-		argument.put("method", "open_dialog");
+		argument.put("method", "dialog");
+		argument.put("text", (String)map.get("text"));
+		argument.put("uuid", (String)map.get("uuid"));
 		
-		params.put("ACCESS_KEY",ACCESS_KEY);
+		params.put("access_key",ACCESS_KEY);
 		params.put("argument", argument);
 		
 		HttpHeaders headers = new HttpHeaders();
