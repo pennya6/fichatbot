@@ -1,72 +1,123 @@
 package com.pennya6.chatbotweb.service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.common.cache.Cache;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pennya6.chatbotweb.dao.ChatDao;
-import com.pennya6.chatbotweb.util.CacheUtils;
+
 
 @Service
 public class ChatService {
 	
-	@Autowired CacheUtils cache;
-	ChatDao chatDao=new ChatDao();
+	//@Autowired CacheUtils cache;
+	private ChatDao chatDao=new ChatDao();
 	
-	public Map open() {
+	public Map<String,Object> open() {
+		String json = chatDao.open(); //map형식으로 return
+		System.out.println(json);
 		
-		Map resp=chatDao.open();
+		ObjectMapper mapper=new ObjectMapper();
 		
-		System.out.println(resp);
+		Map<String,Object> res=new HashMap();
+		try {
+			//api을 쓸수 있는 형식으로 만들어 주는 과정
+			@SuppressWarnings("unchecked")
+			Map<String,Object> map=mapper.readValue(json, Map.class);
+			System.out.println(map);
+			
+			Map<String,Object> return_object=(Map) map.get("return_object");
+			System.out.println(return_object);
+			
+			String uuid=(String) return_object.get("uuid");
+			
+			Map<String,Object>result=(Map<String, Object>) return_object.get("result");
+			String text=(String) result.get("system_text");
+			
+			Map<String,Object>submap=new HashMap<String, Object>();
+			submap.put("id", "user");
+			
+			res.put("id","chatbot");
+			res.put("uuid",uuid);
+			res.put("text",text);
+			res.put("createdAt", new Date());
+			res.put("user",submap);
+			
+			//System.out.println(res);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		Map return_object=MapUtils.getMap(resp, "return_object");
-		String uuid=MapUtils.getString(return_object, "uuid");
+		return res;
 		
-		//System.out.println(uuid);
-		cache.put("uuid",uuid);
-		return makeTemplate(resp);
+		//이것들 리턴하기
+		//uuid:""
+		//text:"안녕하세요"
+		//user:{id:"user"}
 	}
 
-	@SuppressWarnings("unchecked")
-	private Map<String,Object> makeTemplate(Map<String,Object> resp) {
-	
-		Map<String,Object> map=new HashMap();
-		Map<String,Object> chatbotInfo=new HashMap();
-		
-		Map<String,Object> return_object=(Map<String,Object>)MapUtils.getMap(resp, "return_object");
-		Map<String,Object> result=(Map<String,Object>)MapUtils.getMap(return_object,"result");
-		chatbotInfo.put("id","user");
-		
-		map.put("id", "chatbot");
-		
-		System.out.println(return_object);
-		System.out.println(result);
-		
-		map.put("text", MapUtils.getString(result, "system_text"));
-		map.put("createdAt", new Date());
-		map.put("user",chatbotInfo);
-		
-		System.out.println(map);
-		
-		return map;
-
-	}
 
 	public Map message(Map<String, Object> data) {
+		System.out.println(data);
 		
-		String uuid=(String)cache.get("uuid");
-		Map req=new HashMap();
-		req.put("uuid", uuid);
+		@SuppressWarnings("unchecked")
+		Map<String,Object> question=(Map<String,Object>) data.get("question");
+
 		
-		Map map=MapUtils.getMap(data, "data");
-		req.put("text", MapUtils.getString(map, "text"));
+		Map<String,String> req=new HashMap<String,String>();
+		req.put("text", (String) question.get("text"));
+		req.put("uuid", (String) data.get("uuid"));
 		
-		return makeTemplate(chatDao.message(req));
+		String json=chatDao.message(req);
+		
+		ObjectMapper mapper=new ObjectMapper();
+		Map<String,Object> res=new HashMap();
+		try {
+			//api을 쓸수 있는 형식으로 만들어 주는 과정
+			@SuppressWarnings("unchecked")
+			Map<String,Object> map=mapper.readValue(json, Map.class);
+			System.out.println(map);
+			
+			Map<String,Object> return_object=(Map) map.get("return_object");
+			System.out.println(return_object);
+			
+			String uuid=(String) return_object.get("uuid");
+			
+			Map<String,Object>result=(Map<String, Object>) return_object.get("result");
+			String text=(String) result.get("system_text");
+			
+			Map<String,Object>submap=new HashMap<String, Object>();
+			submap.put("id", "user");
+			
+			res.put("id","chatbot");
+			res.put("uuid",uuid);
+			res.put("text",text);
+			res.put("createdAt", new Date());
+			res.put("user",submap);
+			
+			//System.out.println(res);
+		} catch (JsonParseException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		System.out.println(json);
+		return res;
 	}
 
 }

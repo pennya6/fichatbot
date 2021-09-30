@@ -33,11 +33,7 @@ public class ChatController {
 	@PostMapping(value="/chat/open")
 	public Map open() {
 		
-		//메모리 낭비 
-		//ChatService chatService=new ChatService();
-		
-		logger.info("오픈 메소드 호출");
-		//return null;
+
 		return chatService.open();	
 	}
 	
@@ -56,9 +52,7 @@ public class ChatController {
 		//Map map=new HashMap();
 		
 		return chatService.message(data);
-		
-		
-		
+
 		
 		/*
 		 * Map submap=new HashMap();
