@@ -22,6 +22,7 @@ const Messenger = () =>{
 
     //처음 message 상태
     //id값을 통해서 송신자, 수신자 판별
+    //변수 선언
      const [messages,setMessages] = useState([
         //{
             // id : 'chatbot',
@@ -30,9 +31,11 @@ const Messenger = () =>{
             // user : {id:'user'}
          //}
      ]);
+     const [uuid,setUuid]=useState("");
 
     //응답 만들기
     //CORS : 도메인 또는 포트가 다른 서버의 자원을 요청하는 메커니즘
+    //함수선언
     const getAnswer=(message) =>{
         //console.log("HI");
 
@@ -52,7 +55,7 @@ const Messenger = () =>{
             //post,get,delete 등 4가지 메소드
             method:"POST",
             body:JSON.stringify({ //json형태를 string화 하기 위해서
-                data:messages
+                question:message,uuid:uuid
                 //headers부분에 CORS문제 해결
             }), headers:{'Access-Control-Allow-Origin':"*","Content-Type":"application/json"}})
             //보내고 나서 처리를 어떻게 할 것 인가?
@@ -61,6 +64,7 @@ const Messenger = () =>{
             //다시 데이터로 받아서 
             .then((data) => {
                 //메세지안에 저장하겠다
+                //답변 
                 setMessages(messages=>[...messages,data]);
             }).catch(()=>{ //오류 잡기
                 console.log("에러발생");
@@ -82,6 +86,8 @@ const Messenger = () =>{
             headers:{'Access-Control-Allow-Origin':"*","Content-Type":"application/json"}})
             .then((res) =>res.json())
             .then((data)=>{
+                console.log(data.uuid)
+                setUuid(data.uuid);
                 setMessages(messages=>[...messages,data]);
             })
             .catch(()=>{
@@ -91,6 +97,7 @@ const Messenger = () =>{
         };
     
 
+    //첫화면 렌더링
     //상태값을 바뀌면 호출
     //처음들어오면 오픈챗 메소드를 탐
     useEffect(openChat,[]);
@@ -101,8 +108,7 @@ const Messenger = () =>{
             user={{id : 'chatbot'}}
             messages={messages}
             //()=> 함수 표시 필수
-            
-            onSend={(message)=>getAnswer(message)}
+            onSend={(question)=>getAnswer(question)}
         />
     );
 };
