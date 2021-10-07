@@ -134,6 +134,17 @@ public class ChatDao {
 		  
 		  return responBody;
 	  }
+	  private static void copyInputStreamToFile(InputStream inputStream, File file)
+	            throws IOException {
+	        // append = false
+	        try (FileOutputStream outputStream = new FileOutputStream(file, false)) {
+	            int read;
+	            byte[] bytes = new byte[8192];
+	            while ((read = inputStream.read(bytes)) != -1) {
+	                outputStream.write(bytes, 0, read);
+	            }
+	        }
+	    }
 	 
 }
 
