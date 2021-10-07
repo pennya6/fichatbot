@@ -1,9 +1,12 @@
 package com.pennya6.chatbotweb.controller;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +34,12 @@ public class ChatController {
 	
 	@CrossOrigin("*")
 	@PostMapping(value="/chat/open")
-	public Map open() {
-		
+	public Map open(@RequestBody Map data) {
+		//if() 1이면 로그에 강남지점, 2이면 경기지점
+		//System.out.println(data);
+		String num=(String)data.get("num");
+		if(num.equals("1"))System.out.println("서울지점");
+		else System.out.println("경기지점");
 
 		return chatService.open();	
 	}
@@ -44,14 +51,16 @@ public class ChatController {
 	@PostMapping(value="/chat/message") 
 	//requestmapping도 사용하기는 함
 	//단 getmapping하면 더 길이가 줌
-	public Map message(@RequestBody Map<String,Object>data){//Locale locale,Model model) {
+	public Map message(@RequestBody Map<String,Object>data,HttpServletRequest req) throws IOException{//Locale locale,Model model) {
 		//logger.info("메세지 불러오기");
 	
 		//System.out.println(data);
 		//자료구조 map
 		//Map map=new HashMap();
 		
-		return chatService.message(data);
+		//stt 구현
+		
+		return chatService.message(data,req);
 
 		
 		/*

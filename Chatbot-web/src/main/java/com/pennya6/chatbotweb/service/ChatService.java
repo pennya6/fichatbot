@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +52,7 @@ public class ChatService {
 			res.put("text",text);
 			res.put("createdAt", new Date());
 			res.put("user",submap);
+			res.put("ttsUrl",chatDao.tts(folderName,text));
 			
 			//System.out.println(res);
 		} catch (JsonParseException e) {
@@ -68,8 +72,8 @@ public class ChatService {
 	}
 
 
-	public Map message(Map<String, Object> data) {
-		System.out.println(data);
+	public Map message(Map<String, Object> data, HttpServletRequest servletReq) {
+		//System.out.println(data);
 		
 		@SuppressWarnings("unchecked")
 		Map<String,Object> question=(Map<String,Object>) data.get("question");
@@ -78,6 +82,8 @@ public class ChatService {
 		Map<String,String> req=new HashMap<String,String>();
 		req.put("text", (String) question.get("text"));
 		req.put("uuid", (String) data.get("uuid"));
+		
+		String folderName=servletReq.getSession().getServletContext().getRealPath("/");s
 		
 		String json=chatDao.message(req);
 		
