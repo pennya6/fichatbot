@@ -116,7 +116,7 @@ const Vchat=({location})=>{
                             />
                         }
                         rightButtons={
-                            <IconButton aria-label="전송" ><SendIcon/></IconButton>
+                            <IconButton aria-label="전송" onClick={()=>getAnswer}><SendIcon/></IconButton>
                         }
                     />
                 </CardContent>
