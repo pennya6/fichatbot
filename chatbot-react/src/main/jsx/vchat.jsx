@@ -38,7 +38,7 @@ const Vchat=({location})=>{
         setMessages([...messages,message]);
         
         //ajax 짜기
-        const url=`http://localhost:8089/chatbot/chat/message`;
+        const url=`http://localhost:8080/chatbot/chat/message`;
 
         fetch(url,{
             //post,get,delete 등 4가지 메소드
@@ -61,7 +61,7 @@ const Vchat=({location})=>{
 
         console.log(storeNum)
 
-        const url=`http://localhost:8089/chatbot/chat/open`;
+        const url=`http://localhost:8080/chatbot/chat/open`;
 
        
 
@@ -116,7 +116,7 @@ const Vchat=({location})=>{
                             />
                         }
                         rightButtons={
-                            <IconButton aria-label="전송" onClick={()=>getAnswer}><SendIcon/></IconButton>
+                            <IconButton aria-label="전송" onClick={()=>getAnswer()}><SendIcon/></IconButton>
                         }
                     />
                 </CardContent>

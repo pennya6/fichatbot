@@ -43,7 +43,7 @@ const Messenger = () =>{
         setMessages([...messages,message]);
         
         //ajax 짜기
-        const url=`http://localhost:8089/chatbot/chat/message`;
+        const url=`http://localhost:8080/chatbot/chat/message`;
 
         //Access-Control-Allow-Origin response 헤더를 추가
         
@@ -76,7 +76,7 @@ const Messenger = () =>{
         console.log("openChat");
 
         //setMessages([...messages,message]);
-        const url=`http://localhost:8089/chatbot/chat/open`;
+        const url=`http://localhost:8080/chatbot/chat/open`;
 
         fetch(url,{
             method:"POST",body:JSON.stringify({ //json형태를 string화 하기 위해서

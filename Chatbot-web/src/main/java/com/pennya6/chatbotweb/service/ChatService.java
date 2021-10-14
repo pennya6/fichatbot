@@ -52,7 +52,7 @@ public class ChatService {
 			res.put("text",text);
 			res.put("createdAt", new Date());
 			res.put("user",submap);
-			res.put("ttsUrl",chatDao.tts(folderName,text));
+			//res.put("ttsUrl",chatDao.tts(folderName,text));
 			
 			//System.out.println(res);
 		} catch (JsonParseException e) {
@@ -83,7 +83,7 @@ public class ChatService {
 		req.put("text", (String) question.get("text"));
 		req.put("uuid", (String) data.get("uuid"));
 		
-		String folderName=servletReq.getSession().getServletContext().getRealPath("/");s
+		String folderName=servletReq.getSession().getServletContext().getRealPath("/");
 		
 		String json=chatDao.message(req);
 		
