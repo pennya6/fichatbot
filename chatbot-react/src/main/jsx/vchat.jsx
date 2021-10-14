@@ -51,7 +51,8 @@ const Vchat=({location})=>{
             .then((data) => { 
                 setMessages(messages=>[...messages,data]);
             }).catch(()=>{ //오류 잡기
-                console.log("에러발생");
+                //console.log("에러발생");
+                alert("에러발생");
             });
     }; 
 
@@ -107,6 +108,7 @@ const Vchat=({location})=>{
                         placeholder="메시지를 입력하시오"
                         multiline={true}
                         defaultValue={result}
+                        //onchange={(e)=>setQuestion(e.target.value)}
                         leftButtons={
                             //마이크사용
                             <Vocal

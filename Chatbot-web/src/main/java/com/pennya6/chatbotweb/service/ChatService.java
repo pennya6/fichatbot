@@ -125,5 +125,9 @@ public class ChatService {
 		System.out.println(json);
 		return res;
 	}
+	
+	private String removeTags(String text) {
+		return text.replace("<br>","");
+	}
 
 }

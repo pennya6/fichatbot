@@ -38,8 +38,11 @@ public class ChatController {
 		//if() 1이면 로그에 강남지점, 2이면 경기지점
 		//System.out.println(data);
 		String num=(String)data.get("num");
-		if(num.equals("1"))System.out.println("서울지점");
-		else System.out.println("경기지점");
+		
+		if(num.equals("1"))
+			System.out.println("서울지점");
+		else 
+			System.out.println("경기지점");
 
 		return chatService.open();	
 	}
