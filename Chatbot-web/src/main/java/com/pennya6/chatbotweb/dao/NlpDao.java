@@ -1,7 +1,5 @@
 package com.pennya6.chatbotweb.dao;
 
-
-
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,26 +14,25 @@ import java.util.UUID;
 
 import com.google.gson.Gson;
 
-public class ChatDao {
-
+public class NlpDao {
 	private static final String ACCESS_KEY="0d8e5b69-dabd-4652-912e-640b6ad77bcf";
 
-	public String open() {
-		String openApiURL = "http://aiopen.etri.re.kr:8000/Dialog";
-        String accessKey = ACCESS_KEY;    // 발급받은 API Key
-        String domain = "Mc_donald";          // 도메인 명
-        String access_method = "internal_data";   // 도메인 방식
-        String method = "open_dialog";                     // method 호출 방식
-        Gson gson = new Gson();
+	public String nlp(String question) {
+		
+        String openApiURL = "http://aiopen.etri.re.kr:8000/WiseNLU_spoken"; 
  
+        String accessKey = ACCESS_KEY;    // 발급받은 API Key
+        String analysisCode = "morp";   // 언어 분석 코드
+        String text = "페페로니 피자 라지 사이즈 주세요";           // 분석할 텍스트 데이터
+        Gson gson = new Gson();
+         
+        text += "네 안녕하세요 홍길동 교숩니다";
+         
         Map<String, Object> request = new HashMap<>();
         Map<String, String> argument = new HashMap<>();
  
-        ////////////////////////// OPEN DIALOG //////////////////////////
- 
-        argument.put("name", domain);
-        argument.put("access_method", access_method);
-        argument.put("method", method);
+        argument.put("analysis_code", analysisCode);
+        argument.put("text", text);
  
         request.put("access_key", accessKey);
         request.put("argument", argument);
@@ -45,38 +42,37 @@ public class ChatDao {
         Integer responseCode = null;
         String responBody = null;
         try {
-                url = new URL(openApiURL);
-                HttpURLConnection con = (HttpURLConnection)url.openConnection();
-                con.setRequestMethod("POST");
-                con.setDoOutput(true);
+            url = new URL(openApiURL);
+            HttpURLConnection con = (HttpURLConnection)url.openConnection();
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
  
-                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-                wr.write(gson.toJson(request).getBytes("UTF-8"));
-                wr.flush();
-                wr.close();
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.write(gson.toJson(request).getBytes("UTF-8"));
+            wr.flush();
+            wr.close();
  
-                responseCode = con.getResponseCode();
-                InputStream is = con.getInputStream();
-                byte[] buffer = new byte[is.available()];
-                int byteRead = is.read(buffer);
-                responBody = new String(buffer);
+            responseCode = con.getResponseCode();
+            InputStream is = con.getInputStream();
+            byte[] buffer = new byte[is.available()];
+            int byteRead = is.read(buffer);
+            responBody = new String(buffer);
  
-                System.out.println("[responseCode] " + responseCode);
-                System.out.println("[responBody]");
-                System.out.println(responBody);
+            System.out.println("[responseCode] " + responseCode);
+            System.out.println("[responBody]");
+            System.out.println(responBody);
  
         } catch (MalformedURLException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         } catch (IOException e) {
-                e.printStackTrace();
+            e.printStackTrace();
         }
     
-        return responBody;
-		
-	}
 
-	
-	  public static String message(Map map) {
+		
+		return null;
+	}
+	 public static String message(Map map) {
 		  
 		  System.out.println(map);
 		  	String openApiURL = "http://aiopen.etri.re.kr:8000/Dialog";
@@ -192,3 +188,4 @@ public class ChatDao {
 		      }
 		   }
 	}
+

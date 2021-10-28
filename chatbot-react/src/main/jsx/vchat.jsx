@@ -1,99 +1,92 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import { useEffect, useState } from 'react';
+import 'react-simple-chat/src/components/index.css';
+
 // RCE CSS
 import 'react-chat-elements/dist/main.css';
-// MessageBox component
-import { MessageBox } from 'react-chat-elements';
 
-import MicIcon from '@mui/icons-material/Mic';
-import IconButton  from '@mui/material/IconButton';
-import { MessageList } from 'react-chat-elements';
-import { Input } from 'react-chat-elements';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
-import 'react-chat-elements/dist/main.css';
 
-import { useEffect, useState } from "react";
-import Chat,{message} from "react-simple-chat";
+import { MessageList } from 'react-chat-elements'
+
 import Vocal from '@untemps/react-vocal'
 
-const Vchat=({location})=>{
+const VChat = ({ location }) => {
 
-    const [messages,setMessages] = useState([]);
-    const [uuid,setUuid]=useState("");
+    //변수 선언
+    const [messages, setMessages] = useState([]); // 메시지 목록
+    const [uuid, setUuid] = useState("");         // ETRI 오픈챗 uuid
+    const [storeNum, setStoreNum] = useState(location.props && location.props.num);
+    const [question, setQuestion] = useState("");  // STT(Speech To Text)
+    const [speech, setSpeech] = useState("");       // 질문
 
-    const [result, setResult] = useState('')
-
-    //함수
+    //함수 선언
 	const _onVocalStart = () => {
-		setResult('')
+		setQuestion('')
 	}
 
 	const _onVocalResult = (result) => {
-		setResult(result)
+        setQuestion(result);
 	}
 
-    const getAnswer=(message) =>{
-        
-        setMessages([...messages,message]);
-        
-        //ajax 짜기
-        const url=`http://localhost:8080/chatbot/chat/message`;
+    const tts = (url) => {
+        var audio = document.createElement("Audio");
+        audio.src = "http://localhost:8080/chatbot/resources/tts/"+url; 
+        //window.URL.createObjectURL(stream);
+        audio.play();
+    }
 
-        fetch(url,{
-            //post,get,delete 등 4가지 메소드
-            method:"POST",
-            body:JSON.stringify({ //json형태를 string화 하기 위해서
-                question:message,uuid:uuid
-            
-            }), headers:{'Access-Control-Allow-Origin':"*","Content-Type":"application/json"}})
-            .then((res) => res.json())
-            .then((data) => { 
-                setMessages(messages=>[...messages,data]);
-            }).catch(()=>{ //오류 잡기
-                //console.log("에러발생");
-                alert("에러발생");
-            });
-    }; 
-
-    const openChat =(message) =>{
-
-        const storeNum=location.props && location.props.num;
-
-        console.log(storeNum)
-
-        const url=`http://localhost:8080/chatbot/chat/open`;
-
-       
-
-        fetch(url,{
-            method:"POST", body:JSON.stringify({num:storeNum}),
-            headers:{'Access-Control-Allow-Origin':"*","Content-Type":"application/json"}})
-            .then((res) =>res.json())
-            .then((data)=>{
-                console.log(data.uuid)
-                setUuid(data.uuid);
-                setMessages(messages=>[...messages,data]);
-            })
-            .catch(()=>{
-                console.log("error");
-            })
-
+    const getAnswer = () => {
+        console.log(question);
+        //inputRef.getInstance().clear();
+        const answer = {
+            position: 'right',
+            type:'text',
+            text:question,
+            date:new Date()
         };
-    
-    useEffect(openChat,[]);
-    //1.변수 선언(상태)
+        
+        setMessages([...messages, answer]); //질문
+        const url = `http://localhost:8080/chatbot/chat/message`;
+        fetch(url, {method:"POST", body: JSON.stringify({question:answer, uuid:uuid}), headers:{"Access-Control-Allow-Origin":"*", "Content-Type":"application/json"} })
+            .then((res) => res.json())
+            .then((data) => {
+                setQuestion('');
+                setMessages(messages => [...messages, data]); //답변
+                tts(data.ttsUrl);
+            }).catch(() => {
+                console.log("에러발생");
+            });
+    };
 
-    //2. 함수선언
+    const openChat = () => {
+        const url = `http://localhost:8080/chatbot/chat/open`;
+        fetch(url, {method:"POST", body: JSON.stringify({storeNum:storeNum}), headers:{"Access-Control-Allow-Origin":"*", "Content-Type":"application/json"}})
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data.uuid);
+                setUuid(data.uuid);
+                setMessages(messages => [...messages, data]);
+            }).catch(()=>{
+                alert("에러발생 : 서버 켜있는지 확인!!");
+            })
+    };
+
+    useEffect(openChat,[]);
+    useEffect(tts, [speech]);
+    useEffect(()=> {
+        if(question != "") {
+            getAnswer();
+        }
+    }, [question]);
 
     //3. html 코드 렌더링
-
-
-    //항상return
-    return(
+    return (
         <div>
             <Card sx={{height:'96vh', marginTop:'1vh'}}>
-                <CardContent style={{backgroundColor:'pink', height:'82vh'}}>
+                <CardContent style={{backgroundColor:'lightgreen', height:'82vh'}}>
                     <MessageList
                         className='message-list'
                         lockable={true}
@@ -101,31 +94,21 @@ const Vchat=({location})=>{
                         dataSource={messages}
                     />
                 </CardContent>
-                <CardContent>
-                <div>
-		</div>
-                    <Input
-                        placeholder="메시지를 입력하시오"
-                        multiline={true}
-                        defaultValue={result}
-                        //onchange={(e)=>setQuestion(e.target.value)}
-                        leftButtons={
-                            //마이크사용
-                            <Vocal
-                                onStart={_onVocalStart}
-                                onResult={_onVocalResult}
-                                lang="ko-KR"//한국어 설정
-                            />
-                        }
-                        rightButtons={
-                            <IconButton aria-label="전송" onClick={()=>getAnswer()}><SendIcon/></IconButton>
-                        }
+                <CardContent className="rce-container-input">
+                    <Vocal
+                        onStart={_onVocalStart}
+                        onResult={_onVocalResult}
+                        lang="ko-KR"
+                        style={{ display:'flex', flexDirection:'row', margin:'5px' }}
                     />
+                    <input class="rce-input" placeholder="메시지를 입력하시오"  onChange={(e)=>setQuestion(e.target.value)} onKeyDown={(e)=> {if(e.key === 'Enter') { getAnswer() }}} value={question} />
+                    <div class="rce-input-buttons" onClick={()=>{getAnswer()}}>
+                        <IconButton aria-label="전송" ><SendIcon/></IconButton>
+                    </div>
                 </CardContent>
             </Card>
         </div>
-        
     );
 };
 
-export default Vchat;
+export default VChat;
